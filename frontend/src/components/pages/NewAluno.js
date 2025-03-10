@@ -9,7 +9,7 @@ export default function NewAluno(){
     const [type,setType] = useState("");
 
 
-    function addAluno(formData){
+    function addAluno(formData, resetForm){
             console.log("Enviando:", formData);
 
             fetch("http://localhost:8080/sistema/aluno",{
@@ -32,6 +32,7 @@ export default function NewAluno(){
                 })
                 .then(()=>{
                     console.log(formData)
+                    resetForm();
                 })
                 .catch((err)=>console.log(err))
     }
@@ -43,7 +44,7 @@ export default function NewAluno(){
         <section className={styles.container}>
             <h3 className={styles.title}>Dados do aluno</h3>
             {message && <Message type={type} msg={message}/>}
-            <Form btn="adicionar" handleSubmit={addAluno}/>
+            <Form btn="Adicionar" handleSubmit={addAluno}/>
         </section>
     )
    

@@ -78,6 +78,12 @@ export default function Ficha() {
         .catch((err) => console.log(err))
     }
 
+    function formatarData(data) {
+        if (!data) return "";
+        const [ano, mes, dia] = data.split("-");
+        return `${dia}/${mes}/${ano}`; // Transforma para "11/05/2002"
+      }
+
 
 
    return(
@@ -94,12 +100,12 @@ export default function Ficha() {
                             <ul>
                                 <li><span>Aluno: </span>{aluno.nome}</li>
                                 <li><span>Matrícula: </span>{aluno.matricula}</li>
-                                <li><span>Nascimento: </span>{aluno.nascimento}</li>
+                                <li><span>Nascimento: </span>{formatarData(aluno.nascimento)}</li>
                                 <li><span>Mãe: </span>{aluno.mae}</li>
                                 <li><span>Pai: </span>{aluno.pai}</li>
                                 <li><span>Sexo: </span>{aluno.sexo}</li>
                                 <li><span>Contato: </span>{aluno.telefone}</li>
-                                <li><span>Data de matrícula: </span>{aluno.inscricao}</li>
+                                <li><span>Data de matrícula: </span>{formatarData(aluno.inscricao)}</li>
                                 <li><span>Turma:</span>{aluno.turma.nome}</li>
                             </ul>
                         </div>

@@ -61,11 +61,31 @@ export default function Form({ handleSubmit, btn, alunoEdit}) {
     }
   }
 
+
+  function resetForm() {
+    setFormData({
+      nome: "",
+      nascimento: "",
+      telefone: "",
+      sexo: "",
+      inscricao: "",
+      mae: "",
+      pai: "",
+      endereco: {
+        rua: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+      },
+      turmaId: "",
+    });
+  }
+
   return (
     <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
       <form className={`row g-3  ${styles.formulario}`} onSubmit={(event) => {
         event.preventDefault();
-        handleSubmit(formData);
+        handleSubmit(formData,resetForm);
       }}>
         <div className="col-md-6">
           <label htmlFor="nome" className="form-label">Nome</label>
