@@ -1,0 +1,36 @@
+version: "3.8"
+
+
+services:
+    backend:
+      build: /backend
+      ports:
+        - "8080:8080"
+      environment:
+        - SPRING_APPLICATION_NAME=MyAlbum
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/alunos
+          - SPRING_DATASOURCE_USERNAME=postgres
+          - SPRING_DATASOURCE_PASSWORD=1234567
+          - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+          - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+          - SPRING_JPA_SHOW_SQL=true
+          - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+          - SPRING_SQL_INIT_MODE=always
+          - SPRING_SQL_INIT_SCHEMA_LOCATIONS=classpath:schema.sql
+      depends_on:
+        - db
+    frontend:
+      build: ./frontend
+      ports:
+        - "3000:80"
+      depends_on:
+        - backend
+    db:
+      image: postgres:16
+      restart: always
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=1234567
+        - POSTGRES_DB=alunos
+      ports:
+        - "5432:5432"

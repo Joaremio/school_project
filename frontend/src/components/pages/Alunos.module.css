@@ -1,0 +1,22 @@
+.title_container{
+    display: flex;
+    margin-bottom: 2em;
+    justify-content: space-between;
+    padding: 20px;
+    margin-top: 2em;
+    margin-right: 30px;
+}
+.title_container h1{
+    margin-left: 50px;
+    font-size: 25px;
+    color: #C62828;
+    font-weight: bolder;
+}
+
+.alunos_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que os itens "quebrem" para a próxima linha */
+    gap: 16px; /* Espaçamento entre os cards */
+}

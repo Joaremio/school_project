@@ -1,0 +1,89 @@
+/* Estilos para o contêiner de navegação */
+.nav_container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    background-color: #F5F5F5;
+}
+
+.nav_container img {
+    width: 110px; /* Defina o tamanho desejado */
+    height: auto; /* Mantém a proporção */
+    display: block; /* Evita espaços extras */
+    border-radius: 8px; /* Opcional: deixa a borda arredondada */
+}
+
+
+/* Estilos para a lista de itens do menu */
+.nav_container ul {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    list-style: none;
+    flex-grow: 1;
+}
+
+/* Estilos para os links dentro do menu */
+.nav_container li a {
+    text-decoration: none;
+    color: #C62828;
+    font-size: 19px;
+    font-weight: bolder;
+    margin-right: 20px;
+    transition: 0.5s;
+}
+
+.nav_container li a:hover {
+    background-color: #C62828;
+    color: white;
+}
+
+/* Estilos para o botão de dropdown */
+.navLink {
+    text-decoration: none;
+    color: #C62828;
+    font-size: 19px;
+    font-weight: bolder;
+    margin-right: 20px;
+    transition: 0.5s;
+    background-color: #F5F5F5;
+    border: none;
+}
+
+.navLink:focus, .navLink:active {
+    background-color: #C62828;  /* Garante que o fundo seja transparente */
+    box-shadow: none; /* Remove qualquer sombra de foco */
+    color: white;
+}
+
+/* Estilos para o hover do botão de dropdown */
+.navLink:hover {
+    background-color: #C62828;
+    color: white;
+}
+
+/* Estilos para o menu do dropdown */
+.dropdownMenu {
+    background-color: #F5F5F5;  /* Cor de fundo do menu */
+    border-radius: 5px;  /* Bordas arredondadas */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para o menu */
+}
+
+
+
+/* Estilos para os itens do menu dropdown */
+.dropdownItem {
+    color: #C62828;
+    font-size: 15px !important; 
+    font-weight: bolder;
+    align-items: center !important;
+    display: flex !important;
+    justify-content: center;
+}
+
+/* Estilos para o hover nos itens do menu */
+.dropdownItem:hover {
+    background-color: #C62828;
+    color: white;
+}

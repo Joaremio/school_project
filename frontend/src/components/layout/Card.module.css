@@ -1,0 +1,40 @@
+
+.cardContainer {
+    width: 20rem;
+    background-color: #F5F5F5 !important;
+    border: solid 3px #C62828 !important;
+    border-radius: 10px !important;
+  }
+  
+  .cardImg {
+    margin-top: 20px;
+    height: 100px; /* Tamanho menor */
+    max-width: 100px;
+    object-fit: cover; /* Garante que a imagem se ajuste sem distorcer */
+    border-radius: 50px 5px 5px 5px;
+    padding: 15px;
+  }
+  
+  .cardBody {
+    flex: 1;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cardTitle {
+    font-size: 15px;
+    text-align: center;
+    font-weight: bolder;
+    background-color: #F5F5F5;
+    color: #C62828 !important;
+  }
+  
+  .cardItem {
+    background-color: #F5F5F5 !important;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bolder;
+  }
+  
+ 

@@ -1,0 +1,37 @@
+.home_container {
+    display: flex; /* Ativa o flexbox */
+    flex-direction: column; /* Organiza os itens em coluna */
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    height: 80vh; /* Faz o container ocupar toda a altura da tela */
+    text-align: center; /* Centraliza o texto */
+    padding: 12px; /* Adiciona um espaço interno para evitar que encoste nas bordas */
+
+}
+
+.img_container {
+    display: flex;
+    justify-content: center; /* Centraliza a imagem horizontalmente */
+    align-items: center; /* Alinha a imagem verticalmente */
+    width: 450px; /* Define um tamanho fixo */
+    height: 450px; /* Mantém um tamanho quadrado */
+}
+
+.img_container img {
+    max-width: 100%; /* Garante que a imagem não ultrapasse o contêiner */
+    max-height: 100%;
+    border-radius: 50%; /* Deixa a imagem circular */
+    object-fit: cover; /* Garante que a imagem se encaixe sem distorcer */
+}
+
+.text_container {
+    margin-top: 20px; /* Dá espaço entre a imagem e o texto */
+    max-width: 40%; /* Evita que o texto fique muito largo */
+    font-size: 20px;
+    background-color: #C62828;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: bolder;
+}
+

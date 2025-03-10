@@ -1,0 +1,13 @@
+.success{
+    color: rgb(97, 193, 97);;
+    font-weight: bolder;
+}
+.error{
+    color: rgb(239, 12, 12);
+}
+
+.success,
+.error{
+    margin-top: 10px;
+    text-align: center;
+}

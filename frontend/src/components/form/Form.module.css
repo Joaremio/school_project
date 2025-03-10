@@ -1,0 +1,12 @@
+.formulario {
+    max-width: 900px; /* Define um limite de largura */
+    width: 90%; /* Mantém responsivo */
+    background: #f5f5f5; /* Caso queira um fundo branco */
+    padding: 20px; /* Reduz o espaço interno */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra para dar destaque */
+    font-size: 14px;
+    color: #C62828;
+    font-weight: bolder;
+}
+

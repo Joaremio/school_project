@@ -1,0 +1,22 @@
+
+.btn{
+    font-size: 1em;
+    padding: 0.4em 1em;
+    border: none;
+    transition: 0.5s;
+    color: white;
+    background-color: #f14242;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    background-color: maroon;
+}

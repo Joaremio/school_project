@@ -1,0 +1,19 @@
+.btn{
+    font-size: 0.9em;
+    padding: 0.3em;
+    border: none;
+    transition: 0.5s;
+    color: white;
+    background-color: #f14242;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.btn:hover {
+    background-color: maroon;
+}
