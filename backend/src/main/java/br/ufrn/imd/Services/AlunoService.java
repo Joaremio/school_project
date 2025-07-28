@@ -4,6 +4,7 @@ import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Entitys.Endereco;
 import br.ufrn.imd.Entitys.Turma;
 import br.ufrn.imd.Repositories.AlunoRepository;
+import br.ufrn.imd.Repositories.EnderecoRepository;
 import br.ufrn.imd.Repositories.TurmaRepository;
 import br.ufrn.imd.DTO.AlunoRequestDTO;
 import br.ufrn.imd.DTO.EnderecoRequestDTO;
@@ -23,52 +24,47 @@ public class AlunoService {
 
 
     @Autowired
-    private TurmaService turmaService;
+    private EnderecoRepository enderecoRepository;
 
-        public Aluno createAluno(AlunoRequestDTO data) {
 
-            EnderecoRequestDTO enderecoDTO = data.endereco();
+    public Aluno createAluno(AlunoRequestDTO data) {
+
             Aluno aluno = new Aluno();
 
             aluno.setNome(data.nome());
-            aluno.setNascimento(data.nascimento());
-            aluno.setMatricula(data.matricula());
             aluno.setTelefone(data.telefone());
+            aluno.setNomeMae(data.nomeMae());
+            aluno.setNomePai(data.nomePai());
             aluno.setSexo(data.sexo());
-            aluno.setMae(data.mae());
-            aluno.setPai(data.pai());
+            aluno.setDataNascimento(data.dataNascimento());
+            aluno.setEndereco(criarEndereco(data));
+            aluno.setDataMatricula(LocalDate.now());
+            aluno.setMatricula(gerarMatricula(LocalDate.now()));
 
-            // Configuração do endereço
-            Endereco endereco = new Endereco();
-            endereco.setBairro(enderecoDTO.bairro());
-            endereco.setCidade(enderecoDTO.cidade());
-            endereco.setRua(enderecoDTO.rua());
-            endereco.setNumero(enderecoDTO.numero());
-            aluno.setEndereco(endereco);
-
-            aluno.setInscricao(data.inscricao());
-
-            // Gerar a matrícula
-            String matricula = gerarMatricula(data.inscricao());
-            aluno.setMatricula(matricula);
-
-            Turma turma = turmaService.adicionarAlunoATurma(data.turmaId());
-
-            aluno.setTurma(turma);
-
-            // Salvar o aluno primeiro
             alunoRepository.save(aluno);
 
             return aluno;
-        }
+    }
 
+    public Endereco criarEndereco(AlunoRequestDTO data) {
+            Endereco endereco = new Endereco();
+            endereco.setRua(data.rua());
+            endereco.setNumero(data.numero());
+            endereco.setBairro(data.bairro());
+            endereco.setCidade(data.cidade());
 
-        public Optional<Aluno> getAluno(UUID id) {
-        return alunoRepository.findById(id);
+            enderecoRepository.save(endereco);
+
+            return endereco;
     }
 
     public List<Aluno> getAlunos() {
         return alunoRepository.findAll();
+    }
+
+    public Aluno getAluno(UUID id) {
+        return alunoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com id: " + id));
     }
 
     public void deleteAluno(UUID id) {
@@ -80,33 +76,27 @@ public class AlunoService {
 
     public Aluno updateAluno(UUID id, AlunoRequestDTO data) {
         Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com id: " + id));
 
         aluno.setNome(data.nome());
-        aluno.setNascimento(data.nascimento());
-        aluno.setMatricula(data.matricula());
         aluno.setTelefone(data.telefone());
+        aluno.setNomeMae(data.nomeMae());
+        aluno.setNomePai(data.nomePai());
         aluno.setSexo(data.sexo());
-        aluno.setMae(data.mae());
-        aluno.setPai(data.pai());
+        aluno.setDataNascimento(data.dataNascimento());
 
         Endereco endereco = aluno.getEndereco();
-        EnderecoRequestDTO enderecoDTO = data.endereco();
-        endereco.setRua(enderecoDTO.rua());
-        endereco.setNumero(enderecoDTO.numero());
-        endereco.setBairro(enderecoDTO.bairro());
-        endereco.setCidade(enderecoDTO.cidade());
+        endereco.setRua(data.rua());
+        endereco.setNumero(data.numero());
+        endereco.setBairro(data.bairro());
+        endereco.setCidade(data.cidade());
 
-        aluno.setEndereco(endereco);
-
-        if (data.turmaId() != null) {
-            Turma turma = turmaService.buscarTurma(data.turmaId());
-            aluno.setTurma(turma);
-        }
-
+        enderecoRepository.save(endereco);
         alunoRepository.save(aluno);
+
         return aluno;
     }
+
 
     public String gerarMatricula(LocalDate date) {
         String ano = date == null ? String.valueOf(LocalDate.now().getYear()) : String.valueOf(date.getYear());
@@ -114,5 +104,4 @@ public class AlunoService {
         return ano + idCurto;
     }
 }
-
 

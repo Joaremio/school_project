@@ -6,24 +6,25 @@ import br.ufrn.imd.Entitys.Endereco;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
 public record AlunoRequestDTO(
-        String nome,
-        String matricula,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate nascimento,
-        String sexo,
-        String telefone,
-        EnderecoRequestDTO endereco,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate inscricao,  // Alterado de Date para LocalDate
-        UUID turmaId,
-        String mae,
-        String pai)
-{
-}
+        @NotBlank String nome,
+        @NotBlank String telefone,
+        @NotBlank String nomeMae,
+        String nomePai,
+        @NotBlank String sexo,
+        @NotNull LocalDate dataNascimento,
+        @NotBlank String rua,
+        @NotBlank String numero,
+        @NotBlank String bairro,
+        @NotBlank String cidade
+) {}
+
 

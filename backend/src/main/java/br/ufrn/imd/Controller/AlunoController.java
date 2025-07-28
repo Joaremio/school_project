@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sistema")
+@RequestMapping("/aluno")
 public class AlunoController {
 
     @Autowired
@@ -26,21 +26,20 @@ public class AlunoController {
     @Autowired
     private TurmaService turmaService;
 
-    @GetMapping("/alunos")
+    @GetMapping()
     public ResponseEntity<List<Aluno>> getAlunos() {
         List<Aluno> alunos = alunoService.getAlunos();
         return ResponseEntity.status(HttpStatus.OK).body(alunos);
     }
 
-    @GetMapping("/aluno/{id}")
-    public ResponseEntity<?> getAlunoById(@PathVariable UUID id) {
-        return alunoService.getAluno(id)
-                .<ResponseEntity<?>>map(aluno -> ResponseEntity.ok(aluno)) // Força o tipo genérico
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Aluno não encontrado!"));
+    @GetMapping("/{id}")
+    public ResponseEntity<Aluno> getAluno(@PathVariable UUID id) {
+        Aluno aluno = alunoService.getAluno(id);
+        return ResponseEntity.ok(aluno);
     }
 
-    @PostMapping("/aluno")
-    public ResponseEntity<Aluno> createAluno(@RequestBody  AlunoRequestDTO data) {
+    @PostMapping()
+    public ResponseEntity<Aluno> createAluno(@RequestBody AlunoRequestDTO data) {
         Aluno aluno = alunoService.createAluno(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(aluno);
     }
@@ -55,15 +54,12 @@ public class AlunoController {
         }
     }
 
-    @PutMapping("/aluno/{id}")
-    public ResponseEntity<?> updateAluno(@PathVariable UUID id, @RequestBody AlunoRequestDTO data) {
-        try{
-            Aluno aluno = alunoService.updateAluno(id, data);
-            return ResponseEntity.status(HttpStatus.OK).body(aluno);
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<Aluno> updateAluno(@PathVariable UUID id, @RequestBody AlunoRequestDTO data) {
+        Aluno alunoAtualizado = alunoService.updateAluno(id, data);
+        return ResponseEntity.ok(alunoAtualizado);
     }
 
 
 }
+
