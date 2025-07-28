@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name="alunos")
+@Table(name="aluno")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,33 +27,23 @@ public class Aluno {
     private UUID id;
 
     private String nome;
-
-    private String matricula;
-
+    private String cpf;
+    private String email;
     private String telefone;
-
+    private String matricula;
+    private String nomeMae;
+    private String nomePai;
     private String sexo;
+    private boolean ativo;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate nascimento;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataMatricula;
 
-    private String mae;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataNascimento;
 
-    private String pai;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate inscricao;
-
-
-    @OneToOne(cascade = CascadeType.ALL)  // Garante que o Endereco seja salvo automaticamente
-
-    @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name="endereco_id")
     private Endereco endereco;
-
-    @ManyToOne
-    @JoinColumn(name = "turma_id", referencedColumnName = "id")
-    @JsonIgnoreProperties("alunos") // Evita loop e permite exibir a turma no JSON do aluno
-    private Turma turma;
-
 
 }

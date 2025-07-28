@@ -13,7 +13,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "enderecos")
+@Table(name = "endereco")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,8 +22,9 @@ public class Endereco {
     @Id
     @GeneratedValue
     private UUID id;
+
     private String rua;
-    private Long numero;
+    private String numero;
     private String bairro;
     private String cidade;
 }

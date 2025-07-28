@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "turmas")
+@Table(name = "turma")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,9 +27,17 @@ public class Turma {
     @GeneratedValue
     private UUID id;
 
-    private String nome; // Ex: "Matutino", "Vespertino", "Noturno"
+    private String codigo;
 
-    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // Indica que esta é a parte "gerenciada" do relacionamento
+    @Enumerated(EnumType.STRING)
+    private Turno turno;
+
+    @ManyToMany
+    @JoinTable(
+            name = "aluno_turma",
+            joinColumns = @JoinColumn(name="turma_id"),
+            inverseJoinColumns = @JoinColumn(name="aluno_id")
+    )
     private Set<Aluno> alunos = new HashSet<>();
+
 }
