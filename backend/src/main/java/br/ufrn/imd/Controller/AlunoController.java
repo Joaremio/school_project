@@ -44,7 +44,7 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(aluno);
     }
 
-    @DeleteMapping("/aluno/apagar/{id}")
+    @DeleteMapping("apagar/{id}")
     public ResponseEntity<?> deleteAluno(@PathVariable UUID id) {
         try{
             alunoService.deleteAluno(id);

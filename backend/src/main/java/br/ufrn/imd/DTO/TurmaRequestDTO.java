@@ -1,9 +1,11 @@
 package br.ufrn.imd.DTO;
 
+import br.ufrn.imd.Turno;
+
 import java.util.Set;
 import java.util.UUID;
 
 public record TurmaRequestDTO(
-        UUID id,
-        String nome
+        Turno turno,
+        int vagas
 ) {}

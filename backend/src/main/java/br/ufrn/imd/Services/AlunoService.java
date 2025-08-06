@@ -68,11 +68,12 @@ public class AlunoService {
     }
 
     public void deleteAluno(UUID id) {
-        alunoRepository.findById(id).ifPresentOrElse(
-                aluno -> alunoRepository.deleteById(id),
-                () -> { throw new EntityNotFoundException("Aluno não encontrado com o ID: " + id); }
-        );
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com o ID: " + id));
+
+        alunoRepository.delete(aluno);
     }
+
 
     public Aluno updateAluno(UUID id, AlunoRequestDTO data) {
         Aluno aluno = alunoRepository.findById(id)

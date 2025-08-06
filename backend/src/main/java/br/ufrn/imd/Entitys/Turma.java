@@ -29,6 +29,9 @@ public class Turma {
 
     private String codigo;
 
+    @Column(nullable = false)
+    private int vagas;
+
     @Enumerated(EnumType.STRING)
     private Turno turno;
 
