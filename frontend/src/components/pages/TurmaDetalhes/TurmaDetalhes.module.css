@@ -1,0 +1,73 @@
+.title {
+  display: flex;
+  margin-left: 60px;
+  color: #c62828;
+  font-size: 25px;
+  font-weight: bolder;
+  margin-top: 60px;
+}
+
+.turmas_details ul {
+  display: flex; /* transforma a UL em flex container */
+  flex-direction: row; /* garante que os itens fiquem em linha */
+  list-style: none; /* tira as bolinhas */
+  margin-left: 30px;
+  justify-content: space-between;
+  border: #c62828 solid 1px;
+  margin-top: 50px;
+}
+
+.turmas_details ul li {
+  color: #c62828;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.turmas_menu ul {
+  padding: 10px;
+  display: flex;
+  margin-left: 30px;
+  margin-top: 30px;
+  gap: 5px;
+}
+
+.turmas_menu ul li {
+  color: #c62828;
+  background-color: rgb(227, 227, 227);
+  padding: 10px;
+  font-weight: bolder;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 5px;
+}
+
+.alunos_list {
+}
+
+.alunos_list {
+  display: flex;
+  flex-direction: column; /* organiza os cards em coluna */
+  gap: 20px; /* espaço entre os cards */
+  margin-left: 35px;
+}
+
+.alunos_list ul {
+  display: flex;
+  align-items: center; /* centraliza verticalmente os itens dentro do li */
+  justify-content: space-between;
+  border: 2px solid red;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #fff; /* opcional: deixa o card mais “limpo” */
+}
+
+/* Card de conteúdo do aluno */
+.alunos_list div {
+  display: flex;
+  align-items: center; /* centraliza verticalmente o conteúdo */
+  justify-content: center; /* opcional: centraliza horizontalmente */
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}

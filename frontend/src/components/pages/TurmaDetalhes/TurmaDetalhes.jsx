@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styles from "../Ficha.module.css";
+import styles from "./TurmaDetalhes.module.css";
 import Button from "../../layout/Button";
+import Sidebar from "../../layout/Sidebar";
+import Card from "../../layout/Card";
 
 export default function TurmaDetalhes() {
   const { id } = useParams();
@@ -9,12 +11,31 @@ export default function TurmaDetalhes() {
   const [turma, setTurma] = useState([]);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [showParticipantes, setShowParticipantes] = useState(false);
+  const [alunos, setAlunos] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/turma/${id}`)
-      .then((resp) => resp.json())
+    const token = localStorage.getItem("token");
+
+    fetch(`http://localhost:8080/turma/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => {
+        if (!resp.ok) throw new Error("Erro ao buscar turma");
+        return resp.json();
+      })
       .then((data) => {
+        console.log("Dados da turma recebidos:", data); // <--- veja aqui
         setTurma(data);
+
+        if (data.alunos && Array.isArray(data.alunos)) {
+          setAlunos(data.alunos);
+        } else {
+          setAlunos([]); // garante que o estado seja sempre um array
+        }
       })
       .catch((err) => console.log("Erro ao buscar Turma:", err));
   }, [id]);
@@ -49,31 +70,59 @@ export default function TurmaDetalhes() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.dados}>
-        <div className={styles.title}>Detalhes da turma</div>
-        <ul>
-          <li>
-            <span>Código: </span>
-            {turma.codigo}
-          </li>
-          <li>
-            <span>Turno: </span>
-            {turma.turno}
-          </li>
-          <li>
-            <span>Vagas: </span>
-            {turma.vagas}
-          </li>
-        </ul>
-      </div>
-      <div className={styles.btns}>
-        <Button text="Editar" type="btn" />
-        <Button
-          text="Excluir"
-          type="btn"
-          tarefa={() => deleteTurma(turma.id)}
-        />
+    <div className="flex min-h-screen">
+      <Sidebar />
+
+      <div className="flex flex-col flex-1">
+        <section className="p-8">
+          <h1 className={styles.title}>Detalhes da Turma</h1>
+          <div className={styles.turmas_details}>
+            <ul>
+              <li>
+                Código: <span>{turma.codigo}</span>
+              </li>
+              <li>
+                Turno: <span>{turma.turno}</span>
+              </li>
+              <li>
+                Vagas: <span>{turma.vagas}</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <div className="flex flex-col flex-1">
+          <section className="p-8">
+            <div className={styles.turmas_menu}>
+              <ul>
+                <li
+                  className={showParticipantes ? styles.active : ""}
+                  onClick={() => setShowParticipantes(true)}
+                >
+                  Participantes
+                </li>
+                <li>Frequência</li>
+              </ul>
+            </div>
+            {showParticipantes && (
+              <div className={styles.alunos_list}>
+                <ul>
+                  <li>Alunos</li>
+                  <li>
+                    <button>Adicionar</button>
+                  </li>
+                </ul>
+                <div>
+                  {alunos.length > 0 ? (
+                    alunos.map((aluno) => <Card aluno={aluno} />)
+                  ) : (
+                    <p>Nenhum aluno adicionado</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
