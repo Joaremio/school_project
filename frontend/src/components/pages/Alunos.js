@@ -7,7 +7,7 @@ export default function Alunos() {
   const [alunos, setAlunos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/sistema/alunos", {
+    fetch("http://localhost:8080/aluno", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -29,11 +29,7 @@ export default function Alunos() {
       </div>
       <div className={styles.alunos_container}>
         {alunos.length > 0 ? (
-          alunos.map((aluno) => (
-            <Card
-              aluno={aluno}
-            />
-          ))
+          alunos.map((aluno) => <Card aluno={aluno} />)
         ) : (
           <p>Nenhum aluno adicionado</p>
         )}

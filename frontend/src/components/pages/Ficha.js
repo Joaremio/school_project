@@ -1,132 +1,162 @@
-import styles from './Ficha.module.css';
-import {useParams, useNavigate } from "react-router-dom";
+import styles from "./Ficha.module.css";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Button from '../layout/Button';
-import Form from '../form/Form';
+import Button from "../layout/Button";
+import Form from "../form/Form";
 
 export default function Ficha() {
+  const { id } = useParams(); // Pega o ID da URL
+  const navigate = useNavigate();
+  const [aluno, setAluno] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-    const { id } = useParams(); // Pega o ID da URL
-    const navigate = useNavigate();
-    const [aluno, setAluno] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
+  useEffect(() => {
+    if (id) {
+      fetch(`http://localhost:8080/aluno/${id}`)
+        .then((resp) => resp.json())
+        .then((data) => setAluno(data))
+        .catch((err) => console.log("Erro ao buscar aluno:", err));
+    }
+  }, [id]);
 
-    useEffect(() => {
-        if (id) {  // Garante que o ID não é undefined antes de fazer a requisição
-            fetch(`http://localhost:8080/sistema/aluno/${id}`)
-                .then((resp) => resp.json())
-                .then((data) => setAluno(data))
-                .catch((err) => console.log("Erro ao buscar aluno:", err));
+  // Se ainda estiver carregando os dados, mostra um carregamento
+  if (!aluno) {
+    return <p>Carregando...</p>;
+  }
+
+  function editando() {
+    setIsEditing(true);
+  }
+
+  function edit(updatedAluno) {
+    fetch(`http://localhost:8080/aluno/${updatedAluno.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedAluno),
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error("Erro ao atualizar o aluno!");
         }
-    }, [id]);
+        return resp.json();
+      })
+      .then((data) => {
+        console.log("Aluno atualizado com sucesso:", data);
+        setIsEditing(false); // Fecha o formulário após salvar
+        setAluno(data); // Atualiza os dados exibidos
+      })
+      .catch((err) => console.log(err));
+  }
 
-    // Se ainda estiver carregando os dados, mostra um carregamento
-    if (!aluno) {
-        return <p>Carregando...</p>;
-    }
-
-    
-    function editando(){
-        setIsEditing(true);
-    }
-
-    function edit(updatedAluno) {
-
-        fetch(`http://localhost:8080/sistema/aluno/${updatedAluno.id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedAluno),
-        })
-        .then((resp) => {
-            if (!resp.ok) {
-                throw new Error("Erro ao atualizar o aluno!");
-            }
-            return resp.json();
-        })
-        .then((data) => {
-            console.log("Aluno atualizado com sucesso:", data);
-            setIsEditing(false); // Fecha o formulário após salvar
-            setAluno(data); // Atualiza os dados exibidos
-        })
-        .catch((err) => console.log(err));
-    }
-
-    function excluir(){
-
-        const confirmacao = window.confirm("Tem certeza que deseja excluir este aluno?");
-        if(!confirmacao) return;
-
-
-        fetch(`http://localhost:8080/sistema/aluno/apagar/${aluno.id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((resp) => {
-            if (!resp.ok) {
-                throw new Error("Erro ao deletar o aluno!");
-            }
-            return resp.text();
-        })
-        .then(() => {
-            alert("Aluno excluído com sucesso!");
-            navigate("/alunos"); // Redireciona para a página inicial
-        })
-        .catch((err) => console.log(err))
-    }
-
-    function formatarData(data) {
-        if (!data) return "";
-        const [ano, mes, dia] = data.split("-");
-        return `${dia}/${mes}/${ano}`; // Transforma para "11/05/2002"
-      }
-
-
-
-   return(
-        <div>
-            {isEditing ? (
-                <Form handleSubmit={edit} btn="Salvar" alunoEdit={aluno} />
-            ) : (
-                <>
-                    <div className={styles.container}>
-                        <div className={styles.dados}>
-                            <div className={styles.title}>
-                                <h3>Dados</h3>
-                            </div>
-                            <ul>
-                                <li><span>Aluno: </span>{aluno.nome}</li>
-                                <li><span>Matrícula: </span>{aluno.matricula}</li>
-                                <li><span>Nascimento: </span>{formatarData(aluno.nascimento)}</li>
-                                <li><span>Mãe: </span>{aluno.mae}</li>
-                                <li><span>Pai: </span>{aluno.pai}</li>
-                                <li><span>Sexo: </span>{aluno.sexo}</li>
-                                <li><span>Contato: </span>{aluno.telefone}</li>
-                                <li><span>Data de matrícula: </span>{formatarData(aluno.inscricao)}</li>
-                                <li><span>Turma:</span>{aluno.turma.nome}</li>
-                            </ul>
-                        </div>
-                        <div className={styles.dados}>
-                            <div className={styles.title}>
-                                <h3>Endereço</h3>
-                            </div>
-                            <ul>
-                                <li><span>Rua: </span>{aluno?.endereco?.rua || 'Não informado'}</li>
-                                <li><span>Número: </span>{aluno?.endereco?.numero || 'Não informado'}</li>
-                                <li><span>Bairro: </span>{aluno?.endereco?.bairro || 'Não informado'}</li>
-                                <li><span>Cidade: </span>{aluno?.endereco?.cidade || 'Não informado'}</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className={styles.btns}>
-                        <Button text="Editar" type='btn' tarefa={editando} />
-                        <Button text="Excluir" type='btn' tarefa={excluir} />
-                    </div>
-                </>
-            )}
-        </div>
+  function excluir() {
+    const confirmacao = window.confirm(
+      "Tem certeza que deseja excluir este aluno?"
     );
+    if (!confirmacao) return;
+
+    fetch(`http://localhost:8080/aluno/apagar/${aluno.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error("Erro ao deletar o aluno!");
+        }
+        return resp.text();
+      })
+      .then(() => {
+        alert("Aluno excluído com sucesso!");
+        navigate("/alunos"); // Redireciona para a página inicial
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function formatarData(data) {
+    if (!data) return "";
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}/${ano}`; // Transforma para "11/05/2002"
+  }
+
+  return (
+    <div>
+      {isEditing ? (
+        <Form handleSubmit={edit} btn="Salvar" alunoEdit={aluno} />
+      ) : (
+        <>
+          <div className={styles.container}>
+            <div className={styles.dados}>
+              <div className={styles.title}>
+                <h3>Dados</h3>
+              </div>
+              <ul>
+                <li>
+                  <span>Aluno: </span>
+                  {aluno.nome}
+                </li>
+                <li>
+                  <span>Matrícula: </span>
+                  {aluno.matricula}
+                </li>
+                <li>
+                  <span>Nascimento: </span>
+                  {formatarData(aluno.dataNascimento)}
+                </li>
+                <li>
+                  <span>Mãe: </span>
+                  {aluno.nomeMae}
+                </li>
+                <li>
+                  <span>Pai: </span>
+                  {aluno.nomePai}
+                </li>
+                <li>
+                  <span>Sexo: </span>
+                  {aluno.sexo}
+                </li>
+                <li>
+                  <span>Contato: </span>
+                  {aluno.telefone}
+                </li>
+                <li>
+                  <span>Data de matrícula: </span>
+                  {formatarData(aluno.dataMatricula)}
+                </li>
+              </ul>
+            </div>
+            <div className={styles.dados}>
+              <div className={styles.title}>
+                <h3>Endereço</h3>
+              </div>
+              <ul>
+                <li>
+                  <span>Rua: </span>
+                  {aluno?.endereco?.rua || "Não informado"}
+                </li>
+                <li>
+                  <span>Número: </span>
+                  {aluno?.endereco?.numero || "Não informado"}
+                </li>
+                <li>
+                  <span>Bairro: </span>
+                  {aluno?.endereco?.bairro || "Não informado"}
+                </li>
+                <li>
+                  <span>Cidade: </span>
+                  {aluno?.endereco?.cidade || "Não informado"}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className={styles.btns}>
+            <Button text="Editar" type="btn" tarefa={editando} />
+            <Button text="Excluir" type="btn" tarefa={excluir} />
+          </div>
+        </>
+      )}
+    </div>
+  );
 }

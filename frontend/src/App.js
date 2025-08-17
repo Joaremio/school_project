@@ -1,26 +1,73 @@
-import Home from './components/pages/Home'
-import Alunos from './components/pages/Alunos'
-import Turmas from './components/pages/Turmas'
-import NewAluno from './components/pages/NewAluno'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Index from './components/layout/Index';
-import Ficha from './components/pages/Ficha'
-import TurmaPage from './components/pages/TurmaPage'
-
+import Home from "./components/pages/Home";
+import Alunos from "./components/pages/Alunos";
+import NewAluno from "./components/pages/NewAluno";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Ficha from "./components/pages/Ficha";
+import TurmaPage from "./components/pages/TurmaPage/TurmaPage";
+import TurmaDetalhes from "./components/pages/TurmaDetalhes/TurmaDetalhes";
+import PrivateRoute from "./components/auth/PrivateRouter";
+import Login from "./components/pages/Login";
+import Register from "./components/pages/Register";
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <Index />
         <div>
           <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/alunos' element={<Alunos />} />
-            <Route path='/turmas' element={<Turmas />} />
-            <Route path='/newaluno' element={<NewAluno />} />
-            <Route path={`/ficha/:id`} element={<Ficha />} />
-            <Route path={`/turma/:id`} element={<TurmaPage />} />
+            {/* Rotas públicas */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Rotas privadas */}
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/alunos"
+              element={
+                <PrivateRoute>
+                  <Alunos />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/newaluno"
+              element={
+                <PrivateRoute>
+                  <NewAluno />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={`/ficha/:id`}
+              element={
+                <PrivateRoute>
+                  <Ficha />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={`/turmas`}
+              element={
+                <PrivateRoute>
+                  <TurmaPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={`/turma/detalhes/:id`}
+              element={
+                <PrivateRoute>
+                  <TurmaDetalhes />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </div>
       </div>
