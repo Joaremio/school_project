@@ -11,6 +11,7 @@ import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Repositories.TurmaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +20,12 @@ public class TurmaService {
     @Autowired
     private TurmaRepository turmaRepository;
 
-    @Autowired
     private AlunoService alunoService;
+
+    public TurmaService(@Lazy AlunoService alunoService) {
+        this.alunoService = alunoService;
+    }
+
 
     public Turma createTurma(TurmaRequestDTO data) {
         Turma turma = new Turma();

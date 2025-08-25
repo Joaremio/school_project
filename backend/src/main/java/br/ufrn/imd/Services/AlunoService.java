@@ -11,6 +11,7 @@ import br.ufrn.imd.DTO.EnderecoRequestDTO;
 import br.ufrn.imd.Services.TurmaService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +26,12 @@ public class AlunoService {
 
     @Autowired
     private EnderecoRepository enderecoRepository;
+
+    private TurmaService turmaService;
+
+    public AlunoService(@Lazy TurmaService turmaService) {
+        this.turmaService = turmaService;
+    }
 
 
     public Aluno createAluno(AlunoRequestDTO data) {
@@ -103,6 +110,11 @@ public class AlunoService {
         String ano = date == null ? String.valueOf(LocalDate.now().getYear()) : String.valueOf(date.getYear());
         String idCurto = String.format("%06d", new Random().nextInt(10000));
         return ano + idCurto;
+    }
+
+    public List<Aluno> findAlunosNaoEnturmados(UUID turmaId) {
+        Turma turma = turmaService.getTurma(turmaId);
+        return alunoRepository.findAlunosNotInTurma(turma.getId());
     }
 }
 

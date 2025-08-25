@@ -60,6 +60,12 @@ public class AlunoController {
         return ResponseEntity.ok(alunoAtualizado);
     }
 
+    @GetMapping("/nao-enturmados/{turmaId}")
+    public ResponseEntity<List<Aluno>> getAlunosNaoEnturmados(@PathVariable UUID turmaId) {
+        List<Aluno> alunosDisponiveis = alunoService.findAlunosNaoEnturmados(turmaId);
+        return ResponseEntity.ok(alunosDisponiveis);
+    }
+
 
 }
 
