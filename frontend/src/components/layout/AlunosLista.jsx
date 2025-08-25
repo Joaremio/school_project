@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { IoMdAdd } from "react-icons/io";
 
-export default function AlunoModal({ show, handleClose, turmaId }) {
+export default function AlunosLista({ show, handleClose, turmaId }) {
   const [alunos, setAlunos] = useState([]);
 
   // Buscar alunos sem turma quando o modal abrir
@@ -10,7 +10,7 @@ export default function AlunoModal({ show, handleClose, turmaId }) {
     if (show) {
       const token = localStorage.getItem("token");
 
-      fetch("http://localhost:8080/aluno/sem-turma", {
+      fetch(`http://localhost:8080/aluno/nao-enturmados/${turmaId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

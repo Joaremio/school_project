@@ -3,23 +3,46 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Button from "../layout/Button";
 import Form from "../form/Form";
+import Sidebar from "../layout/Sidebar";
 
 export default function Ficha() {
   const { id } = useParams(); // Pega o ID da URL
   const navigate = useNavigate();
   const [aluno, setAluno] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [erro, setErro] = useState(null);
 
   useEffect(() => {
     if (id) {
-      fetch(`http://localhost:8080/aluno/${id}`)
-        .then((resp) => resp.json())
+      const token = localStorage.getItem("token"); // pega o token salvo
+      fetch(`http://localhost:8080/aluno/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // envia no header
+          "Content-Type": "application/json",
+        },
+      })
+        .then((resp) => {
+          if (!resp.ok) {
+            throw new Error(
+              `Erro ${resp.status}: Não foi possível buscar o aluno`
+            );
+          }
+          return resp.json();
+        })
         .then((data) => setAluno(data))
-        .catch((err) => console.log("Erro ao buscar aluno:", err));
+        .catch((err) => {
+          console.log("Erro ao buscar aluno:", err);
+          setErro(err.message);
+        });
     }
   }, [id]);
 
-  // Se ainda estiver carregando os dados, mostra um carregamento
+  // Se der erro no carregamento
+  if (erro) {
+    return <p style={{ color: "red" }}>{erro}</p>;
+  }
+
+  // Enquanto estiver carregando
   if (!aluno) {
     return <p>Carregando...</p>;
   }
@@ -29,10 +52,13 @@ export default function Ficha() {
   }
 
   function edit(updatedAluno) {
+    const token = localStorage.getItem("token");
+
     fetch(`http://localhost:8080/aluno/${updatedAluno.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🔑 token aqui
       },
       body: JSON.stringify(updatedAluno),
     })
@@ -44,8 +70,8 @@ export default function Ficha() {
       })
       .then((data) => {
         console.log("Aluno atualizado com sucesso:", data);
-        setIsEditing(false); // Fecha o formulário após salvar
-        setAluno(data); // Atualiza os dados exibidos
+        setIsEditing(false);
+        setAluno(data);
       })
       .catch((err) => console.log(err));
   }
@@ -56,10 +82,13 @@ export default function Ficha() {
     );
     if (!confirmacao) return;
 
+    const token = localStorage.getItem("token");
+
     fetch(`http://localhost:8080/aluno/apagar/${aluno.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🔑 token aqui também
       },
     })
       .then((resp) => {
@@ -70,7 +99,7 @@ export default function Ficha() {
       })
       .then(() => {
         alert("Aluno excluído com sucesso!");
-        navigate("/alunos"); // Redireciona para a página inicial
+        navigate("/alunos");
       })
       .catch((err) => console.log(err));
   }
@@ -82,81 +111,84 @@ export default function Ficha() {
   }
 
   return (
-    <div>
-      {isEditing ? (
-        <Form handleSubmit={edit} btn="Salvar" alunoEdit={aluno} />
-      ) : (
-        <>
-          <div className={styles.container}>
-            <div className={styles.dados}>
-              <div className={styles.title}>
-                <h3>Dados</h3>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 p-6">
+        {isEditing ? (
+          <Form handleSubmit={edit} btn="Salvar" alunoEdit={aluno} />
+        ) : (
+          <>
+            <div className={styles.container}>
+              <div className={styles.dados}>
+                <div className={styles.title}>
+                  <h3>Dados</h3>
+                </div>
+                <ul>
+                  <li>
+                    <span>Aluno: </span>
+                    {aluno.nome}
+                  </li>
+                  <li>
+                    <span>Matrícula: </span>
+                    {aluno.matricula}
+                  </li>
+                  <li>
+                    <span>Nascimento: </span>
+                    {formatarData(aluno.dataNascimento)}
+                  </li>
+                  <li>
+                    <span>Mãe: </span>
+                    {aluno.nomeMae}
+                  </li>
+                  <li>
+                    <span>Pai: </span>
+                    {aluno.nomePai}
+                  </li>
+                  <li>
+                    <span>Sexo: </span>
+                    {aluno.sexo}
+                  </li>
+                  <li>
+                    <span>Contato: </span>
+                    {aluno.telefone}
+                  </li>
+                  <li>
+                    <span>Data de matrícula: </span>
+                    {formatarData(aluno.dataMatricula)}
+                  </li>
+                </ul>
               </div>
-              <ul>
-                <li>
-                  <span>Aluno: </span>
-                  {aluno.nome}
-                </li>
-                <li>
-                  <span>Matrícula: </span>
-                  {aluno.matricula}
-                </li>
-                <li>
-                  <span>Nascimento: </span>
-                  {formatarData(aluno.dataNascimento)}
-                </li>
-                <li>
-                  <span>Mãe: </span>
-                  {aluno.nomeMae}
-                </li>
-                <li>
-                  <span>Pai: </span>
-                  {aluno.nomePai}
-                </li>
-                <li>
-                  <span>Sexo: </span>
-                  {aluno.sexo}
-                </li>
-                <li>
-                  <span>Contato: </span>
-                  {aluno.telefone}
-                </li>
-                <li>
-                  <span>Data de matrícula: </span>
-                  {formatarData(aluno.dataMatricula)}
-                </li>
-              </ul>
-            </div>
-            <div className={styles.dados}>
-              <div className={styles.title}>
-                <h3>Endereço</h3>
+              <div className={styles.dados}>
+                <div className={styles.title}>
+                  <h3>Endereço</h3>
+                </div>
+                <ul>
+                  <li>
+                    <span>Rua: </span>
+                    {aluno?.endereco?.rua || "Não informado"}
+                  </li>
+                  <li>
+                    <span>Número: </span>
+                    {aluno?.endereco?.numero || "Não informado"}
+                  </li>
+                  <li>
+                    <span>Bairro: </span>
+                    {aluno?.endereco?.bairro || "Não informado"}
+                  </li>
+                  <li>
+                    <span>Cidade: </span>
+                    {aluno?.endereco?.cidade || "Não informado"}
+                  </li>
+                </ul>
               </div>
-              <ul>
-                <li>
-                  <span>Rua: </span>
-                  {aluno?.endereco?.rua || "Não informado"}
-                </li>
-                <li>
-                  <span>Número: </span>
-                  {aluno?.endereco?.numero || "Não informado"}
-                </li>
-                <li>
-                  <span>Bairro: </span>
-                  {aluno?.endereco?.bairro || "Não informado"}
-                </li>
-                <li>
-                  <span>Cidade: </span>
-                  {aluno?.endereco?.cidade || "Não informado"}
-                </li>
-              </ul>
             </div>
-          </div>
-          <div className={styles.btns}>
-            <Button text="Editar" type="btn" tarefa={editando} />
-            <Button text="Excluir" type="btn" tarefa={excluir} />
-          </div>
-        </>
-      )}
+            <div className={styles.btns}>
+              <Button text="Editar" type="btn" tarefa={editando} />
+              <Button text="Excluir" type="btn" tarefa={excluir} />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
