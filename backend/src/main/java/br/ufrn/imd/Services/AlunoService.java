@@ -9,6 +9,7 @@ import br.ufrn.imd.Repositories.TurmaRepository;
 import br.ufrn.imd.DTO.AlunoRequestDTO;
 import br.ufrn.imd.DTO.EnderecoRequestDTO;
 import br.ufrn.imd.Services.TurmaService;
+import br.ufrn.imd.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -71,20 +72,18 @@ public class AlunoService {
 
     public Aluno getAluno(UUID id) {
         return alunoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com id: " + id));
     }
 
     public void deleteAluno(UUID id) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com o ID: " + id));
+        Aluno aluno = getAluno(id);
 
         alunoRepository.delete(aluno);
     }
 
 
     public Aluno updateAluno(UUID id, AlunoRequestDTO data) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado com id: " + id));
+        Aluno aluno = getAluno(id);
 
         aluno.setNome(data.nome());
         aluno.setTelefone(data.telefone());

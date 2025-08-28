@@ -9,6 +9,10 @@ import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Entitys.Turma;
 import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Repositories.TurmaRepository;
+import br.ufrn.imd.exceptions.AlunoJaMatriculadoException;
+import br.ufrn.imd.exceptions.AlunoNaoMatriculadoException;
+import br.ufrn.imd.exceptions.ResourceNotFoundException;
+import br.ufrn.imd.exceptions.TurmaEsgotadaException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -45,15 +49,17 @@ public class TurmaService {
     }
 
     public Turma getTurma(UUID id) {
-        return turmaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Turma não encontrada"));
+        return turmaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Turma não encontrada"));
     }
 
     public void deleteTurma(UUID id) {
+        Turma turma = getTurma(id);
+
         turmaRepository.deleteById(id);
     }
 
     public Turma updateTurma(UUID id, TurmaRequestDTO data) {
-        Turma turma = turmaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Turma não encontrada"));
+        Turma turma = getTurma(id);
 
         turma.setTurno(data.turno());
         turma.setVagas(data.vagas());
@@ -68,11 +74,11 @@ public class TurmaService {
         Aluno aluno = alunoService.getAluno(alunoId);
 
         if (turma.getAlunos().contains(aluno)) {
-            throw new IllegalStateException("Aluno já está matriculado nesta turma.");
+            throw new AlunoJaMatriculadoException("Aluno já está matriculado nesta turma.");
         }
 
         if (turma.getVagas() <= 0) {
-            throw new RuntimeException("Turma esgotada");
+            throw new TurmaEsgotadaException("Turma esgotada");
         }
 
         turma.getAlunos().add(aluno);
@@ -91,7 +97,7 @@ public class TurmaService {
             turma.getAlunos().remove(aluno);
             turma.setVagas(turma.getVagas() + 1);
         }else{
-            throw new IllegalStateException("Aluno não está matriculado na turma");
+            throw new AlunoNaoMatriculadoException("Aluno não está matriculado na turma");
         }
     }
 

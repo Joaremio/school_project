@@ -6,6 +6,7 @@ import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Services.AlunoService;
 import br.ufrn.imd.Services.TurmaService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,34 +29,28 @@ public class AlunoController {
 
     @GetMapping()
     public ResponseEntity<List<Aluno>> getAlunos() {
-        List<Aluno> alunos = alunoService.getAlunos();
-        return ResponseEntity.status(HttpStatus.OK).body(alunos);
+        return ResponseEntity.ok(alunoService.getAlunos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Aluno> getAluno(@PathVariable UUID id) {
-        Aluno aluno = alunoService.getAluno(id);
-        return ResponseEntity.ok(aluno);
+        return ResponseEntity.ok(alunoService.getAluno(id));
     }
 
     @PostMapping()
-    public ResponseEntity<Aluno> createAluno(@RequestBody AlunoRequestDTO data) {
+    public ResponseEntity<Aluno> createAluno(@Valid @RequestBody AlunoRequestDTO data) {
         Aluno aluno = alunoService.createAluno(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(aluno);
     }
 
     @DeleteMapping("apagar/{id}")
     public ResponseEntity<?> deleteAluno(@PathVariable UUID id) {
-        try{
-            alunoService.deleteAluno(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Deletado com sucesso!");
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        alunoService.deleteAluno(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Aluno> updateAluno(@PathVariable UUID id, @RequestBody AlunoRequestDTO data) {
+    public ResponseEntity<Aluno> updateAluno(@PathVariable UUID id, @Valid @RequestBody AlunoRequestDTO data) {
         Aluno alunoAtualizado = alunoService.updateAluno(id, data);
         return ResponseEntity.ok(alunoAtualizado);
     }
