@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -28,9 +30,6 @@ public class Aluno {
     @Column(nullable = false)
     private String telefone;
 
-    @Column(unique = true) // pode ser nulo, mas deve ser único se informado
-    private String matricula;
-
     @Column(nullable = false)
     private String nomeMae;
 
@@ -39,12 +38,11 @@ public class Aluno {
     @Column(nullable = false)
     private String sexo;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private boolean ativo=true;
+    @Column(unique = true)
+    private String matricula;
 
-    @Column(nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dataMatricula;
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean ativo = true;
 
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -53,4 +51,7 @@ public class Aluno {
     @OneToOne
     @JoinColumn(name = "endereco_id", nullable = false)
     private Endereco endereco;
+
+    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Matricula> matriculas = new HashSet<>();
 }

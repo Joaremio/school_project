@@ -1,89 +1,81 @@
 package br.ufrn.imd.Services;
 
+import br.ufrn.imd.DTO.AlunoRequestDTO;
+import br.ufrn.imd.DTO.AlunoResponseDTO;
+import br.ufrn.imd.DTO.EnderecoResponseDTO;
 import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Entitys.Endereco;
-import br.ufrn.imd.Entitys.Turma;
 import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Repositories.EnderecoRepository;
-import br.ufrn.imd.Repositories.TurmaRepository;
-import br.ufrn.imd.DTO.AlunoRequestDTO;
-import br.ufrn.imd.DTO.EnderecoRequestDTO;
-import br.ufrn.imd.Services.TurmaService;
 import br.ufrn.imd.exceptions.ResourceNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AlunoService {
 
-    @Autowired
     private AlunoRepository alunoRepository;
-
-
-    @Autowired
     private EnderecoRepository enderecoRepository;
 
-    private TurmaService turmaService;
-
-    public AlunoService(@Lazy TurmaService turmaService) {
-        this.turmaService = turmaService;
+    public AlunoService(AlunoRepository alunoRepository, EnderecoRepository enderecoRepository) {
+        this.alunoRepository = alunoRepository;
+        this.enderecoRepository = enderecoRepository;
     }
 
+    @Transactional
+    public AlunoResponseDTO createAluno(AlunoRequestDTO data) {
 
-    public Aluno createAluno(AlunoRequestDTO data) {
+        Endereco endereco = new Endereco();
+        endereco.setRua(data.rua());
+        endereco.setNumero(data.numero());
+        endereco.setBairro(data.bairro());
+        endereco.setCidade(data.cidade());
+        Endereco enderecoSalvo = enderecoRepository.save(endereco);
 
-            Aluno aluno = new Aluno();
+        Aluno aluno = new Aluno();
 
-            aluno.setNome(data.nome());
-            aluno.setTelefone(data.telefone());
-            aluno.setNomeMae(data.nomeMae());
-            aluno.setNomePai(data.nomePai());
-            aluno.setSexo(data.sexo());
-            aluno.setDataNascimento(data.dataNascimento());
-            aluno.setEndereco(criarEndereco(data));
-            aluno.setDataMatricula(LocalDate.now());
-            aluno.setMatricula(gerarMatricula(LocalDate.now()));
+        aluno.setNome(data.nome());
+        aluno.setTelefone(data.telefone());
+        aluno.setNomeMae(data.nomeMae());
+        aluno.setNomePai(data.nomePai());
+        aluno.setSexo(data.sexo());
+        aluno.setDataNascimento(data.dataNascimento());
+        aluno.setEndereco(enderecoSalvo);
+        aluno.setMatricula(gerarMatricula());
 
-            alunoRepository.save(aluno);
-
-            return aluno;
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+        return toResponseDTO(alunoSalvo);
     }
 
-    public Endereco criarEndereco(AlunoRequestDTO data) {
-            Endereco endereco = new Endereco();
-            endereco.setRua(data.rua());
-            endereco.setNumero(data.numero());
-            endereco.setBairro(data.bairro());
-            endereco.setCidade(data.cidade());
-
-            enderecoRepository.save(endereco);
-
-            return endereco;
+    @Transactional(readOnly = true)
+    public List<AlunoResponseDTO> getAlunos() {
+        return alunoRepository.findAll().stream().map(this::toResponseDTO).toList();
     }
 
-    public List<Aluno> getAlunos() {
-        return alunoRepository.findAll();
+    @Transactional(readOnly = true)
+    public AlunoResponseDTO getAlunoById(UUID id) {
+        Aluno aluno = findAlunoById(id);
+        return toResponseDTO(aluno);
     }
 
-    public Aluno getAluno(UUID id) {
+    protected Aluno findAlunoById(UUID id) {
         return alunoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com id: " + id));
     }
 
+    @Transactional
     public void deleteAluno(UUID id) {
-        Aluno aluno = getAluno(id);
-
+        Aluno aluno = findAlunoById(id);
         alunoRepository.delete(aluno);
     }
 
-
-    public Aluno updateAluno(UUID id, AlunoRequestDTO data) {
-        Aluno aluno = getAluno(id);
+    @Transactional
+    public AlunoResponseDTO updateAluno(UUID id, AlunoRequestDTO data) {
+        Aluno aluno = findAlunoById(id);
 
         aluno.setNome(data.nome());
         aluno.setTelefone(data.telefone());
@@ -99,21 +91,50 @@ public class AlunoService {
         endereco.setCidade(data.cidade());
 
         enderecoRepository.save(endereco);
-        alunoRepository.save(aluno);
 
-        return aluno;
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+
+        return toResponseDTO(alunoSalvo);
     }
 
-
-    public String gerarMatricula(LocalDate date) {
-        String ano = date == null ? String.valueOf(LocalDate.now().getYear()) : String.valueOf(date.getYear());
-        String idCurto = String.format("%06d", new Random().nextInt(10000));
-        return ano + idCurto;
+    private String gerarMatricula() {
+        String ano = String.valueOf(LocalDate.now().getYear());
+        return ano + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
 
-    public List<Aluno> findAlunosNaoEnturmados(UUID turmaId) {
-        Turma turma = turmaService.getTurma(turmaId);
-        return alunoRepository.findAlunosNotInTurma(turma.getId());
+    @Transactional(readOnly = true)
+    public List<AlunoResponseDTO> findAlunosNaoMatriculadosNaTurma(UUID turmaId) {
+        List<Aluno> alunos = alunoRepository.findAlunosNaoMatriculadosNaTurma(turmaId);
+        return alunos.stream().map(this::toResponseDTO).toList();
+    }
+
+    private EnderecoResponseDTO toEnderecoResponseDTO(Endereco endereco) {
+        if (endereco == null) {
+            return null;
+        }
+        return new EnderecoResponseDTO(
+                endereco.getRua(),
+                endereco.getNumero(),
+                endereco.getBairro(),
+                endereco.getCidade()
+        );
+    }
+
+    private AlunoResponseDTO toResponseDTO(Aluno aluno) {
+
+        EnderecoResponseDTO enderecoDTO = toEnderecoResponseDTO(aluno.getEndereco());
+
+        return new AlunoResponseDTO(
+                aluno.getId(),
+                aluno.getNome(),
+                aluno.getTelefone(),
+                aluno.getMatricula(),
+                aluno.getNomeMae(),
+                aluno.getNomePai(),
+                aluno.getSexo(),
+                aluno.getDataNascimento(),
+                enderecoDTO
+        );
     }
 }
 

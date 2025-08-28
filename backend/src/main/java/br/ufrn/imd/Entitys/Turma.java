@@ -2,9 +2,6 @@ package br.ufrn.imd.Entitys;
 
 
 import br.ufrn.imd.Turno;
-
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,12 +32,6 @@ public class Turma {
     @Enumerated(EnumType.STRING)
     private Turno turno;
 
-    @ManyToMany
-    @JoinTable(
-            name = "aluno_turma",
-            joinColumns = @JoinColumn(name="turma_id"),
-            inverseJoinColumns = @JoinColumn(name="aluno_id")
-    )
-    private Set<Aluno> alunos = new HashSet<>();
-
+    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Matricula> matriculas = new HashSet<>();
 }
