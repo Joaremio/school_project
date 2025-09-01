@@ -18,7 +18,7 @@ export default function TurmaPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:8080/turma", {
+    fetch("http://localhost:8080/turmas", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function TurmaPage() {
 
   function createTurma() {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:8080/turma", {
+    fetch("http://localhost:8080/turmas", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -5,12 +5,11 @@ import { IoMdAdd } from "react-icons/io";
 export default function AlunosLista({ show, handleClose, turmaId }) {
   const [alunos, setAlunos] = useState([]);
 
-  // Buscar alunos sem turma quando o modal abrir
   useEffect(() => {
     if (show) {
       const token = localStorage.getItem("token");
 
-      fetch(`http://localhost:8080/aluno/nao-enturmados/${turmaId}`, {
+      fetch(`http://localhost:8080/alunos/nao-matriculados/turma/${turmaId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -28,18 +27,33 @@ export default function AlunosLista({ show, handleClose, turmaId }) {
   function addAlunoOnTurma(alunoId) {
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8080/turma/adicionar/${alunoId}/${turmaId}`, {
-      method: "PUT",
+    const body = {
+      alunoId,
+      turmaId,
+    };
+
+    fetch(`http://localhost:8080/turmas/matricular`, {
+      method: "POST", // provavelmente é POST agora
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify(body),
     })
       .then((resp) => {
-        if (!resp.ok) throw new Error("Erro ao adicionar aluno na turma");
-        setAlunos((prev) => prev.filter((a) => a.id !== alunoId));
+        if (!resp.ok) {
+          return resp.json().then((err) => {
+            throw new Error(err.message || "Erro ao adicionar aluno na turma");
+          });
+        }
+        return resp.json();
       })
-      .catch((err) => console.error(err));
+      .then((novaMatricula) => {
+        // remove o aluno da lista de disponíveis
+        setAlunos((prev) => prev.filter((a) => a.id !== alunoId));
+        console.log("Matrícula criada:", novaMatricula);
+      })
+      .catch((err) => alert(err.message));
   }
 
   return (

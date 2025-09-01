@@ -14,10 +14,10 @@ export default function Ficha() {
 
   useEffect(() => {
     if (id) {
-      const token = localStorage.getItem("token"); // pega o token salvo
-      fetch(`http://localhost:8080/aluno/${id}`, {
+      const token = localStorage.getItem("token");
+      fetch(`http://localhost:8080/alunos/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // envia no header
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       })
@@ -37,12 +37,10 @@ export default function Ficha() {
     }
   }, [id]);
 
-  // Se der erro no carregamento
   if (erro) {
     return <p style={{ color: "red" }}>{erro}</p>;
   }
 
-  // Enquanto estiver carregando
   if (!aluno) {
     return <p>Carregando...</p>;
   }
@@ -54,11 +52,11 @@ export default function Ficha() {
   function edit(updatedAluno) {
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8080/aluno/${updatedAluno.id}`, {
+    fetch(`http://localhost:8080/alunos/${updatedAluno.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // 🔑 token aqui
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(updatedAluno),
     })
@@ -84,11 +82,11 @@ export default function Ficha() {
 
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8080/aluno/apagar/${aluno.id}`, {
+    fetch(`http://localhost:8080/alunos/${aluno.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // 🔑 token aqui também
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((resp) => {
@@ -107,7 +105,7 @@ export default function Ficha() {
   function formatarData(data) {
     if (!data) return "";
     const [ano, mes, dia] = data.split("-");
-    return `${dia}/${mes}/${ano}`; // Transforma para "11/05/2002"
+    return `${dia}/${mes}/${ano}`;
   }
 
   return (

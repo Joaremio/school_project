@@ -4,6 +4,8 @@ import styles from "./Alunos.module.css";
 import LinkButton from "../layout/LinkButton";
 import Sidebar from "../layout/Sidebar";
 import Button from "../layout/Button";
+import axios from "axios";
+
 import {
   Modal,
   Button as BootstrapButton,
@@ -31,7 +33,7 @@ export default function Alunos() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:8080/aluno", {
+    fetch("http://localhost:8080/alunos", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -40,7 +42,7 @@ export default function Alunos() {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        console.log(data); // Verifique no console se os dados estão corretos
+        console.log(data);
         setAlunos(data);
       })
       .catch((err) => console.log(err));
@@ -50,10 +52,38 @@ export default function Alunos() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
-  function createTurma() {
-    return "oi";
-  }
+  function createAluno() {
+    const token = localStorage.getItem("token");
 
+    axios
+      .post("http://localhost:8080/alunos", formData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const novoAluno = response.data;
+        setAlunos([...alunos, novoAluno]);
+        setShowModal(false);
+        setFormData({
+          nome: "",
+          telefone: "",
+          nomeMae: "",
+          nomePai: "",
+          sexo: "",
+          dataNascimento: "",
+          rua: "",
+          numero: "",
+          bairro: "",
+          cidade: "",
+        });
+      })
+      .catch((error) => {
+        const msg = error.response?.data?.message || "Erro ao criar aluno";
+        alert(msg);
+      });
+  }
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
@@ -215,7 +245,7 @@ export default function Alunos() {
             >
               Cancelar
             </BootstrapButton>
-            <BootstrapButton variant="primary" onClick={createTurma}>
+            <BootstrapButton variant="primary" onClick={createAluno}>
               Criar
             </BootstrapButton>
           </Modal.Footer>

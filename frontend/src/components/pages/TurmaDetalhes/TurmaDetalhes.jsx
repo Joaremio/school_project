@@ -15,10 +15,38 @@ export default function TurmaDetalhes() {
 
   const navigate = useNavigate();
 
+  async function fetchAlunos() {
+    const token = localStorage.getItem("token");
+    try {
+      const resp = await fetch(`http://localhost:8080/alunos/turma/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!resp.ok) {
+        throw new Error("Erro ao buscar alunos da turma");
+      }
+      const data = await resp.json();
+      setAlunos(data);
+    } catch (err) {
+      console.error("Erro ao buscar Alunos:", err);
+    }
+  }
+
+  // NOVO: Função para controlar o clique na aba "Participantes"
+  function handleShowParticipantes() {
+    setShowParticipantes(true);
+    // Otimização: só busca os alunos se a lista estiver vazia
+    if (alunos.length === 0 && turma.quantidadeAlunos > 0) {
+      fetchAlunos();
+    }
+  }
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8080/turma/${id}`, {
+    fetch(`http://localhost:8080/turmas/${id}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -30,7 +58,8 @@ export default function TurmaDetalhes() {
       })
       .then((data) => {
         setTurma(data);
-        setAlunos(data.alunos || []);
+        // REMOVIDO: A busca de alunos agora é feita sob demanda
+        // setAlunos(data.alunos || []);
       })
       .catch((err) => console.log("Erro ao buscar Turma:", err));
   }, [id]);
@@ -43,7 +72,7 @@ export default function TurmaDetalhes() {
     );
     if (!confirmacao) return;
 
-    fetch(`http://localhost:8080/turma/${turmaId}`, {
+    fetch(`http://localhost:8080/turmas/${turmaId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -67,7 +96,21 @@ export default function TurmaDetalhes() {
 
       <div className="flex flex-col flex-1">
         <section className="p-8">
-          <h1 className={styles.title}>Detalhes da Turma</h1>
+          <div className="grid grid-cols-[auto_1fr] items-center w-full p-4">
+            <h1 className="text-xl font-bold inline-block w-1/2">
+              Detalhes da turma
+            </h1>
+
+            {/* Os botões estão na segunda coluna da grade. 'justify-self-end' os alinha à direita */}
+            <div className="flex gap-2 items-center justify-self-end w-1/2">
+              <button className="bg-red-400 text-black px-4 py-2 rounded">
+                Excluir
+              </button>
+              <button className="bg-blue-500 text-black px-4 py-2 rounded">
+                Editar
+              </button>
+            </div>
+          </div>
           <div className={styles.turmas_details}>
             <ul>
               <li>
@@ -88,7 +131,7 @@ export default function TurmaDetalhes() {
             <ul>
               <li
                 className={showParticipantes ? styles.active : ""}
-                onClick={() => setShowParticipantes(true)}
+                onClick={handleShowParticipantes}
               >
                 Participantes
               </li>
@@ -105,19 +148,17 @@ export default function TurmaDetalhes() {
                 </li>
               </ul>
 
-              <div>
+              <div className="mt-6 grid gap-6 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
                 {alunos.length > 0 ? (
                   alunos.map((aluno) => <Card key={aluno.id} aluno={aluno} />)
                 ) : (
-                  <p>Nenhum aluno adicionado</p>
+                  <p>Nenhum aluno matriculado nessa turma</p>
                 )}
               </div>
             </div>
           )}
         </section>
       </div>
-
-      {/* Modal de adicionar aluno */}
       <AlunosLista
         show={showModal}
         handleClose={() => setShowModal(false)}
