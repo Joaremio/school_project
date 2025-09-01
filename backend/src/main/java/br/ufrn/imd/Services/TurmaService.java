@@ -7,6 +7,7 @@ import br.ufrn.imd.DTO.TurmaResponseDTO;
 import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Entitys.Matricula;
 import br.ufrn.imd.Entitys.Turma;
+import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Repositories.MatriculaRepository;
 import br.ufrn.imd.Repositories.TurmaRepository;
 import br.ufrn.imd.StatusMatricula;
@@ -25,12 +26,12 @@ import java.util.UUID;
 public class TurmaService {
 
     private final TurmaRepository turmaRepository;
-    private final AlunoService alunoService;
+    private final AlunoRepository alunoRepository;
     private final MatriculaRepository matriculaRepository;
 
-    public TurmaService(TurmaRepository turmaRepository, AlunoService alunoService, MatriculaRepository matriculaRepository) {
+    public TurmaService(TurmaRepository turmaRepository, AlunoRepository alunoRepository, MatriculaRepository matriculaRepository) {
         this.turmaRepository = turmaRepository;
-        this.alunoService = alunoService;
+        this.alunoRepository = alunoRepository;
         this.matriculaRepository = matriculaRepository;
     }
 
@@ -70,7 +71,7 @@ public class TurmaService {
     @Transactional
     public MatriculaResponseDTO matricularAluno(MatriculaRequestDTO data) {
         Turma turma = findTurmaById(data.turmaId());
-        Aluno aluno = alunoService.findAlunoById(data.alunoId());
+        Aluno aluno = alunoRepository.findById(data.alunoId()).orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com ID: " + data.alunoId()));
 
         if (matriculaRepository.existsByAlunoIdAndTurmaId(aluno.getId(), turma.getId())) {
             throw new AlunoJaMatriculadoException("Aluno já matriculado nesta turma.");
@@ -146,4 +147,5 @@ public class TurmaService {
     private MatriculaResponseDTO toMatriculaResponseDTO(Matricula matricula) {
         return new MatriculaResponseDTO(matricula.getId(), matricula.getAluno().getId(), matricula.getTurma().getId(), matricula.getDataMatricula(), matricula.getStatus());
     }
+
 }

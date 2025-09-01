@@ -3,10 +3,12 @@ package br.ufrn.imd.Services;
 import br.ufrn.imd.DTO.AlunoRequestDTO;
 import br.ufrn.imd.DTO.AlunoResponseDTO;
 import br.ufrn.imd.DTO.EnderecoResponseDTO;
+import br.ufrn.imd.DTO.TurmaResponseDTO;
 import br.ufrn.imd.Entitys.Aluno;
 import br.ufrn.imd.Entitys.Endereco;
 import br.ufrn.imd.Repositories.AlunoRepository;
 import br.ufrn.imd.Repositories.EnderecoRepository;
+import br.ufrn.imd.Repositories.MatriculaRepository;
 import br.ufrn.imd.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +20,16 @@ import java.util.UUID;
 @Service
 public class AlunoService {
 
+    private final TurmaService turmaService;
     private AlunoRepository alunoRepository;
     private EnderecoRepository enderecoRepository;
+    private MatriculaRepository matriculaRepository;
 
-    public AlunoService(AlunoRepository alunoRepository, EnderecoRepository enderecoRepository) {
+    public AlunoService(AlunoRepository alunoRepository, EnderecoRepository enderecoRepository, TurmaService turmaService, MatriculaRepository matriculaRepository) {
         this.alunoRepository = alunoRepository;
         this.enderecoRepository = enderecoRepository;
+        this.turmaService = turmaService;
+        this.matriculaRepository = matriculaRepository;
     }
 
     @Transactional
@@ -105,6 +111,13 @@ public class AlunoService {
     @Transactional(readOnly = true)
     public List<AlunoResponseDTO> findAlunosNaoMatriculadosNaTurma(UUID turmaId) {
         List<Aluno> alunos = alunoRepository.findAlunosNaoMatriculadosNaTurma(turmaId);
+        return alunos.stream().map(this::toResponseDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlunoResponseDTO> getAlunosByTurmaId(UUID turmaId) {
+        TurmaResponseDTO turma = turmaService.getTurma(turmaId);
+        List<Aluno> alunos = matriculaRepository.findAlunosByTurmaId(turma.id());
         return alunos.stream().map(this::toResponseDTO).toList();
     }
 
