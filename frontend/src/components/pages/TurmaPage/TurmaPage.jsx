@@ -4,6 +4,7 @@ import CardTurma from "../../layout/CardTurma/CardTurma";
 import Sidebar from "../../layout/Sidebar"; // 🔹 Importando a sidebar
 import styles from "../Alunos.module.css";
 import Button from "../../layout/Button";
+import api from "../../../api/axios";
 import { Modal, Button as BootstrapButton, Form } from "react-bootstrap";
 
 export default function TurmaPage() {
@@ -16,22 +17,14 @@ export default function TurmaPage() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/turmas", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
+    api
+      .get("/turmas")
       .then((resp) => {
-        if (!resp.ok) {
-          throw new Error("Erro na requisição");
-        }
-        return resp.json();
+        setTurmas(resp.data);
       })
-      .then((data) => setTurmas(data))
-      .catch((err) => console.error("Erro ao buscar Turmas:", err));
+      .catch((err) => {
+        console.error("Erro ao buscar Turmas:", err);
+      });
   }, []);
 
   function handleChange(e) {
@@ -39,29 +32,15 @@ export default function TurmaPage() {
   }
 
   function createTurma() {
-    const token = localStorage.getItem("token");
-    fetch("http://localhost:8080/turmas", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          const error = await resp.text();
-          console.error("Erro:", error);
-          return;
-        }
-        return resp.json();
-      })
-      .then((novaTurma) => {
-        if (novaTurma) {
-          setTurmas((prev) => [...prev, novaTurma]);
-          setShowModal(false);
-          setFormData({ vagas: "", turno: "" });
-        }
+    // 🔹 3. SUBSTITUA O FETCH PELO API.POST
+    // O token e o "Content-Type" são adicionados automaticamente.
+    api
+      .post("/turmas", formData) // O segundo argumento já é o body
+      .then((resp) => {
+        const novaTurma = resp.data;
+        setTurmas((prev) => [...prev, novaTurma]);
+        setShowModal(false);
+        setFormData({ vagas: "", turno: "" });
       })
       .catch((err) => console.log(err));
   }

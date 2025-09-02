@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { IoReturnUpBackOutline } from "react-icons/io5";
 
@@ -17,15 +17,18 @@ export default function Register() {
       alert("As senhas não coincidem!");
       return;
     }
+
     try {
-      const resp = await axios.post("http://localhost:8080/auth/register", {
+      const resp = await api.post("/auth/register", {
         name,
         email,
         password,
       });
+
       localStorage.setItem("token", resp.data.token);
       navigate("/");
     } catch (err) {
+      console.error("Erro ao registrar:", err); // ✅ Melhor para debug
       alert("Erro ao registrar!");
     }
   };
