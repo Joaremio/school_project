@@ -1,20 +1,25 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Estágio 1: Build da aplicação com Maven
+FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
+COPY mvnw .
+COPY .mvn .mvn
 COPY pom.xml .
 
-RUN mvn dependency:go-offline
+RUN ./mvnw dependency:go-offline
 
-COPY src /app/src
+COPY src ./src
 
-RUN mvn clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
-FROM openjdk:21
+
+# Estágio 2: Imagem final, otimizada para execução
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 

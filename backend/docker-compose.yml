@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Banco de dados
+  db:
+    image: postgres:15
+    container_name: postgres-db-alunos
+    environment:
+      POSTGRES_DB: alunos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234567
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Backend Spring
+  backend:
+    build: .
+    container_name: sistema-backenddoc
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/alunos
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234567
+      API_SECURITY_TOKEN_SECRET: meuSegredoUltraSeguro123  # <-- Secret direto aqui
+
+volumes:
+  postgres-data:
