@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080", // seu backend
+  baseURL: "https://school-project-suew.onrender.com", // seu backend
 });
 
 // Intercepta e injeta o token
