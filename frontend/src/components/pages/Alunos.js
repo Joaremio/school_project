@@ -97,7 +97,135 @@ export default function Alunos() {
             <Modal.Title>Criar Novo Aluno</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form>{/* Aqui continua o mesmo form */}</Form>
+            <Form>
+              <Row className="mb-3">
+                <Col md={6}>
+                  <Form.Group controlId="formNome">
+                    <Form.Label>Nome</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group controlId="formDataNascimento">
+                    <Form.Label>Data de nascimento</Form.Label>
+                    <Form.Control
+                      type="date"
+                      name="dataNascimento"
+                      value={formData.dataNascimento}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col md={6}>
+                  <Form.Group controlId="formNomeMae">
+                    <Form.Label>Mãe</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="nomeMae"
+                      value={formData.nomeMae}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group controlId="formNomePai">
+                    <Form.Label>Pai</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="nomePai"
+                      value={formData.nomePai}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col md={4}>
+                  <Form.Group controlId="formSexo">
+                    <Form.Label>Sexo</Form.Label>
+                    <Form.Select
+                      name="sexo"
+                      value={formData.sexo}
+                      onChange={handleChange}
+                    >
+                      <option value="">Selecione...</option>
+                      <option value="F">Feminino</option>
+                      <option value="M">Masculino</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group controlId="formTelefone">
+                    <Form.Label>Telefone</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="telefone"
+                      value={formData.telefone}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group controlId="formNumero">
+                    <Form.Label>Número</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="numero"
+                      value={formData.numero}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col md={6}>
+                  <Form.Group controlId="formRua">
+                    <Form.Label>Rua</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="rua"
+                      value={formData.rua}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group controlId="formBairro">
+                    <Form.Label>Bairro</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="bairro"
+                      value={formData.bairro}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={12}>
+                  <Form.Group controlId="formCidade">
+                    <Form.Label>Cidade</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cidade"
+                      value={formData.cidade}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Form>
           </Modal.Body>
           <Modal.Footer>
             <BootstrapButton
