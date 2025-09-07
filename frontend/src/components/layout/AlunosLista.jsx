@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { IoMdAdd } from "react-icons/io";
-import { api } from "../../api/axios";
+import api from "../../api/axios";
 
 export default function AlunosLista({ show, handleClose, turmaId }) {
   const [alunos, setAlunos] = useState([]);
