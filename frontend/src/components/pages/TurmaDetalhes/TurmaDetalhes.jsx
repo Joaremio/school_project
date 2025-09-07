@@ -4,7 +4,8 @@ import styles from "./TurmaDetalhes.module.css";
 import Button from "../../layout/Button";
 import Sidebar from "../../layout/Sidebar";
 import Card from "../../layout/Card";
-import AlunosLista from "../../layout/AlunosLista"; // import do modal
+import AlunosLista from "../../layout/AlunosLista";
+import api from "../../../api/axios";
 
 export default function TurmaDetalhes() {
   const { id } = useParams();
@@ -16,78 +17,50 @@ export default function TurmaDetalhes() {
   const navigate = useNavigate();
 
   async function fetchAlunos() {
-    const token = localStorage.getItem("token");
     try {
-      const resp = await fetch(`http://localhost:8080/alunos/turma/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!resp.ok) {
-        throw new Error("Erro ao buscar alunos da turma");
-      }
-      const data = await resp.json();
-      setAlunos(data);
+      const resp = await api.get(`/alunos/turma/${id}`);
+      setAlunos(resp.data);
     } catch (err) {
       console.error("Erro ao buscar Alunos:", err);
     }
   }
 
-  // NOVO: Função para controlar o clique na aba "Participantes"
   function handleShowParticipantes() {
     setShowParticipantes(true);
-    // Otimização: só busca os alunos se a lista estiver vazia
     if (alunos.length === 0 && turma.quantidadeAlunos > 0) {
       fetchAlunos();
     }
   }
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    async function fetchTurma() {
+      try {
+        const resp = await api.get(`/turmas/${id}`);
+        setTurma(resp.data);
+      } catch (err) {
+        console.log("Erro ao buscar Turma:", err);
+      }
+    }
 
-    fetch(`http://localhost:8080/turmas/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => {
-        if (!resp.ok) throw new Error("Erro ao buscar turma");
-        return resp.json();
-      })
-      .then((data) => {
-        setTurma(data);
-        // REMOVIDO: A busca de alunos agora é feita sob demanda
-        // setAlunos(data.alunos || []);
-      })
-      .catch((err) => console.log("Erro ao buscar Turma:", err));
+    fetchTurma();
   }, [id]);
 
   if (!turma) return <p>Carregando detalhes da turma...</p>;
 
-  function deleteTurma(turmaId) {
+  async function deleteTurma(turmaId) {
     const confirmacao = window.confirm(
       "Tem certeza que deseja excluir esta turma?"
     );
     if (!confirmacao) return;
 
-    fetch(`http://localhost:8080/turmas/${turmaId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((resp) => {
-        if (!resp.ok) throw new Error("Erro ao deletar turma!");
-        return resp.text();
-      })
-      .then(() => {
-        alert("Turma excluída com sucesso!");
-        navigate("/turmas");
-      })
-      .catch((err) => {
-        console.error("Erro ao deletar turma:", err);
-        alert("Erro ao deletar turma. Verifique se o servidor está rodando.");
-      });
+    try {
+      await api.delete(`/turmas/${turmaId}`);
+      alert("Turma excluída com sucesso!");
+      navigate("/turmas");
+    } catch (err) {
+      console.error("Erro ao deletar turma:", err);
+      alert("Erro ao deletar turma. Verifique se o servidor está rodando.");
+    }
   }
 
   return (
@@ -101,9 +74,11 @@ export default function TurmaDetalhes() {
               Detalhes da turma
             </h1>
 
-            {/* Os botões estão na segunda coluna da grade. 'justify-self-end' os alinha à direita */}
             <div className="flex gap-2 items-center justify-self-end w-1/2">
-              <button className="bg-red-400 text-black px-4 py-2 rounded">
+              <button
+                className="bg-red-400 text-black px-4 py-2 rounded"
+                onClick={() => deleteTurma(turma.id)}
+              >
                 Excluir
               </button>
               <button className="bg-blue-500 text-black px-4 py-2 rounded">
@@ -159,6 +134,7 @@ export default function TurmaDetalhes() {
           )}
         </section>
       </div>
+
       <AlunosLista
         show={showModal}
         handleClose={() => setShowModal(false)}

@@ -1,59 +1,39 @@
 import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { IoMdAdd } from "react-icons/io";
+import { api } from "../../api/axios";
 
 export default function AlunosLista({ show, handleClose, turmaId }) {
   const [alunos, setAlunos] = useState([]);
 
   useEffect(() => {
     if (show) {
-      const token = localStorage.getItem("token");
-
-      fetch(`http://localhost:8080/alunos/nao-matriculados/turma/${turmaId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((resp) => {
-          if (!resp.ok) throw new Error("Erro ao buscar alunos sem turma");
-          return resp.json();
-        })
-        .then((data) => setAlunos(data))
-        .catch((err) => console.error(err));
+      api
+        .get(`/alunos/nao-matriculados/turma/${turmaId}`)
+        .then((resp) => setAlunos(resp.data))
+        .catch((err) => console.error("Erro ao buscar alunos sem turma:", err));
     }
-  }, [show]);
+  }, [show, turmaId]);
 
   function addAlunoOnTurma(alunoId) {
-    const token = localStorage.getItem("token");
-
     const body = {
       alunoId,
       turmaId,
     };
 
-    fetch(`http://localhost:8080/turmas/matricular`, {
-      method: "POST", // provavelmente é POST agora
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    })
+    api
+      .post("/turmas/matricular", body)
       .then((resp) => {
-        if (!resp.ok) {
-          return resp.json().then((err) => {
-            throw new Error(err.message || "Erro ao adicionar aluno na turma");
-          });
-        }
-        return resp.json();
-      })
-      .then((novaMatricula) => {
         // remove o aluno da lista de disponíveis
         setAlunos((prev) => prev.filter((a) => a.id !== alunoId));
-        console.log("Matrícula criada:", novaMatricula);
+        console.log("Matrícula criada:", resp.data);
       })
-      .catch((err) => alert(err.message));
+      .catch((err) => {
+        // trata erros do backend
+        const msg =
+          err.response?.data?.message || "Erro ao adicionar aluno na turma";
+        alert(msg);
+      });
   }
 
   return (

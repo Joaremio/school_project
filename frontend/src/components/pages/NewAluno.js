@@ -2,6 +2,7 @@ import Form from "../form/Form";
 import { useState } from "react";
 import styles from "./NewAluno.module.css";
 import Message from "../layout/Message";
+import api from "../../api/axios"; // instância configurada com baseURL
 
 export default function NewAluno() {
   const [message, setMessage] = useState("");
@@ -10,29 +11,19 @@ export default function NewAluno() {
   function addAluno(formData, resetForm) {
     console.log("Enviando:", formData);
 
-    fetch("http://localhost:8080/aluno", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          const error = await resp.text();
-          setMessage(error);
-          setType("error");
-          return;
-        }
+    api
+      .post("/aluno", formData)
+      .then((resp) => {
         setMessage("Aluno matriculado com sucesso!");
         setType("success");
-        return resp.json();
-      })
-      .then(() => {
-        console.log(formData);
         resetForm();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const errorMsg =
+          err.response?.data?.message || "Erro ao matricular aluno";
+        setMessage(errorMsg);
+        setType("error");
+      });
   }
 
   return (

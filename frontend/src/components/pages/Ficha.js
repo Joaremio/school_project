@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Button from "../layout/Button";
 import Form from "../form/Form";
 import Sidebar from "../layout/Sidebar";
+import api from "../../api/axios"; // use a instância do axios configurada
 
 export default function Ficha() {
-  const { id } = useParams(); // Pega o ID da URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [aluno, setAluno] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -14,92 +15,49 @@ export default function Ficha() {
 
   useEffect(() => {
     if (id) {
-      const token = localStorage.getItem("token");
-      fetch(`http://localhost:8080/alunos/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-        .then((resp) => {
-          if (!resp.ok) {
-            throw new Error(
-              `Erro ${resp.status}: Não foi possível buscar o aluno`
-            );
-          }
-          return resp.json();
-        })
-        .then((data) => setAluno(data))
+      api
+        .get(`/alunos/${id}`)
+        .then((resp) => setAluno(resp.data))
         .catch((err) => {
           console.log("Erro ao buscar aluno:", err);
-          setErro(err.message);
+          setErro(err.response?.data?.message || "Erro ao buscar aluno");
         });
     }
   }, [id]);
 
-  if (erro) {
-    return <p style={{ color: "red" }}>{erro}</p>;
-  }
-
-  if (!aluno) {
-    return <p>Carregando...</p>;
-  }
+  if (erro) return <p style={{ color: "red" }}>{erro}</p>;
+  if (!aluno) return <p>Carregando...</p>;
 
   function editando() {
     setIsEditing(true);
   }
 
   function edit(updatedAluno) {
-    const token = localStorage.getItem("token");
-
-    fetch(`http://localhost:8080/alunos/${updatedAluno.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedAluno),
-    })
+    api
+      .put(`/alunos/${updatedAluno.id}`, updatedAluno)
       .then((resp) => {
-        if (!resp.ok) {
-          throw new Error("Erro ao atualizar o aluno!");
-        }
-        return resp.json();
-      })
-      .then((data) => {
-        console.log("Aluno atualizado com sucesso:", data);
+        setAluno(resp.data);
         setIsEditing(false);
-        setAluno(data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("Erro ao atualizar aluno:", err);
+        alert(err.response?.data?.message || "Erro ao atualizar aluno");
+      });
   }
 
   function excluir() {
-    const confirmacao = window.confirm(
-      "Tem certeza que deseja excluir este aluno?"
-    );
-    if (!confirmacao) return;
+    if (!window.confirm("Tem certeza que deseja excluir este aluno?")) return;
 
-    const token = localStorage.getItem("token");
-
-    fetch(`http://localhost:8080/alunos/${aluno.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error("Erro ao deletar o aluno!");
-        }
-        return resp.text();
-      })
+    api
+      .delete(`/alunos/${aluno.id}`)
       .then(() => {
         alert("Aluno excluído com sucesso!");
         navigate("/alunos");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("Erro ao deletar aluno:", err);
+        alert(err.response?.data?.message || "Erro ao deletar aluno");
+      });
   }
 
   function formatarData(data) {
